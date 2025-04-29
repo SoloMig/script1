@@ -1,0 +1,211 @@
+-- Variáveis principais
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local AimbotAtivo = false
+local ESPAtivo = false
+local ESPFolder = Instance.new("Folder", workspace)
+ESPFolder.Name = "ESPFolder"
+
+local InterfaceVisivel = true
+
+-- Funções principais
+
+-- Aimbot: Inimigo mais próximo do PLAYER
+function GetNearestEnemy()
+    local nearestEnemy = nil
+    local shortestDistance = math.huge
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Team ~= LocalPlayer.Team and player.Character and player.Character:FindFirstChild("Head") then
+            local distance = (LocalPlayer.Character.Head.Position - player.Character.Head.Position).Magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                nearestEnemy = player
+            end
+        end
+    end
+
+    return nearestEnemy
+end
+
+-- Aimbot Loop
+RunService.RenderStepped:Connect(function()
+    if AimbotAtivo then
+        local target = GetNearestEnemy()
+        if target and target.Character and target.Character:FindFirstChild("Head") then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.Head.Position)
+        end
+    end
+end)
+
+-- Criar ESP para um jogador
+function CriarESP(player)
+    if not ESPAtivo then return end
+    if not player.Character or not player.Character:FindFirstChild("Head") then return end
+    if player.Team == LocalPlayer.Team then return end
+
+    local BillboardGui = Instance.new("BillboardGui")
+    BillboardGui.Name = "ESP"
+    BillboardGui.Adornee = player.Character.Head
+    BillboardGui.Parent = ESPFolder
+    BillboardGui.Size = UDim2.new(5, 0, 5, 0)
+    BillboardGui.AlwaysOnTop = true
+
+    local Circle = Instance.new("ImageLabel")
+    Circle.Parent = BillboardGui
+    Circle.BackgroundTransparency = 1
+    Circle.Size = UDim2.new(1, 0, 1, 0)
+    Circle.Image = "rbxassetid://3570695787" -- Círculo padrão
+    Circle.ImageColor3 = Color3.fromRGB(255, 0, 0)
+    Circle.ScaleType = Enum.ScaleType.Stretch
+
+    local NameLabel = Instance.new("TextLabel")
+    NameLabel.Parent = BillboardGui
+    NameLabel.BackgroundTransparency = 1
+    NameLabel.Position = UDim2.new(0, 0, -0.6, 0)
+    NameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    NameLabel.Text = player.Name
+    NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    NameLabel.TextStrokeTransparency = 0.5
+    NameLabel.Font = Enum.Font.SourceSansBold
+    NameLabel.TextScaled = true
+
+    local DistanceLabel = Instance.new("TextLabel")
+    DistanceLabel.Parent = BillboardGui
+    DistanceLabel.BackgroundTransparency = 1
+    DistanceLabel.Position = UDim2.new(0, 0, -0.3, 0)
+    DistanceLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    DistanceLabel.Text = ""
+    DistanceLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    DistanceLabel.TextStrokeTransparency = 0.5
+    DistanceLabel.Font = Enum.Font.SourceSans
+    DistanceLabel.TextScaled = true
+
+    local HealthBack = Instance.new("Frame")
+    HealthBack.Parent = BillboardGui
+    HealthBack.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    HealthBack.Size = UDim2.new(1, 0, 0.1, 0)
+    HealthBack.Position = UDim2.new(0, 0, 1, 0)
+
+    local HealthBar = Instance.new("Frame")
+    HealthBar.Parent = HealthBack
+    HealthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    HealthBar.Size = UDim2.new(1, 0, 1, 0)
+
+    RunService.RenderStepped:Connect(function()
+        if player and player.Character and player.Character:FindFirstChild("Head") and player.Character:FindFirstChild("Humanoid") then
+            local distance = (LocalPlayer.Character.Head.Position - player.Character.Head.Position).Magnitude
+            DistanceLabel.Text = string.format("%.0f m", distance)
+
+            local humanoid = player.Character.Humanoid
+            if humanoid then
+                local healthPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+                HealthBar.Size = UDim2.new(healthPercent, 0, 1, 0)
+
+                if healthPercent > 0.5 then
+                    HealthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                elseif healthPercent > 0.2 then
+                    HealthBar.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+                else
+                    HealthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                end
+            end
+        end
+    end)
+end
+
+function CriarTodosESPs()
+    ESPFolder:ClearAllChildren()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            CriarESP(player)
+        end
+    end
+end
+
+-- Interface
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Position = UDim2.new(0.05, 0, 0.2, 0)
+Frame.Size = UDim2.new(0, 220, 0, 270)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderColor3 = Color3.fromRGB(255, 0, 0)
+Frame.BorderSizePixel = 2
+Frame.Active = true
+Frame.Draggable = true
+
+-- Título
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "SoloMig Hub"
+Title.TextColor3 = Color3.fromRGB(255, 0, 0)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
+
+-- Botões
+local AimbotButton = Instance.new("TextButton", Frame)
+AimbotButton.Position = UDim2.new(0, 10, 0, 40)
+AimbotButton.Size = UDim2.new(0, 200, 0, 40)
+AimbotButton.Text = "Ativar Aimbot"
+AimbotButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+AimbotButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AimbotButton.Font = Enum.Font.GothamBold
+AimbotButton.TextScaled = true
+
+local ESPButton = Instance.new("TextButton", Frame)
+ESPButton.Position = UDim2.new(0, 10, 0, 90)
+ESPButton.Size = UDim2.new(0, 200, 0, 40)
+ESPButton.Text = "Ativar ESP"
+ESPButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ESPButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ESPButton.Font = Enum.Font.GothamBold
+ESPButton.TextScaled = true
+
+local RefreshESPButton = Instance.new("TextButton", Frame)
+RefreshESPButton.Position = UDim2.new(0, 10, 0, 140)
+RefreshESPButton.Size = UDim2.new(0, 200, 0, 40)
+RefreshESPButton.Text = "Refresh ESP (H)"
+RefreshESPButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+RefreshESPButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+RefreshESPButton.Font = Enum.Font.GothamBold
+RefreshESPButton.TextScaled = true
+
+-- Botões ações
+AimbotButton.MouseButton1Click:Connect(function()
+    AimbotAtivo = not AimbotAtivo
+    AimbotButton.Text = AimbotAtivo and "Desativar Aimbot" or "Ativar Aimbot"
+end)
+
+ESPButton.MouseButton1Click:Connect(function()
+    ESPAtivo = not ESPAtivo
+    ESPButton.Text = ESPAtivo and "Desativar ESP" or "Ativar ESP"
+    CriarTodosESPs()
+end)
+
+RefreshESPButton.MouseButton1Click:Connect(function()
+    CriarTodosESPs()
+end)
+
+-- Teclas de atalho
+UIS.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.H then
+            CriarTodosESPs()
+        elseif input.KeyCode == Enum.KeyCode.Six then
+            ESPAtivo = not ESPAtivo
+            ESPButton.Text = ESPAtivo and "Desativar ESP" or "Ativar ESP"
+            CriarTodosESPs()
+        elseif input.KeyCode == Enum.KeyCode.Seven then
+            AimbotAtivo = not AimbotAtivo
+            AimbotButton.Text = AimbotAtivo and "Desativar Aimbot" or "Ativar Aimbot"
+        elseif input.KeyCode == Enum.KeyCode.K then
+            InterfaceVisivel = not InterfaceVisivel
+            Frame.Visible = InterfaceVisivel
+        end
+    end
+end)
