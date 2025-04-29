@@ -251,3 +251,45 @@ UIS.InputBegan:Connect(function(input)
         NoclipButton.Text = noclipAtivo and "Desativar Noclip" or "Ativar Noclip"
     end
 end)
+
+-- Variável para contar os pressionamentos de tecla
+local jumpPressCount = 0
+local jumpPressTime = 0
+local jumpPressLimit = 3  -- Limite de pressionamentos seguidos
+
+-- Função para ativar o pulo infinito
+local function enableInfiniteJump()
+    local humanoid = plr.Character and plr.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid.JumpPower = 100  -- Ajuste a altura do pulo conforme necessário
+        humanoid.Jump = true
+        humanoid.Changed:Connect(function()
+            if humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                humanoid.Jump = true  -- Garantir que o pulo seja contínuo
+            end
+        end)
+    end
+end
+
+-- Detectar pressionamento da tecla espaço
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+
+    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Space then
+        jumpPressCount = jumpPressCount + 1
+        jumpPressTime = tick()
+
+        -- Verifica se a tecla espaço foi pressionada 3 vezes
+        if jumpPressCount >= jumpPressLimit then
+            -- Se o tempo entre os pressionamentos for muito longo, resetar a contagem
+            if tick() - jumpPressTime > 2 then
+                jumpPressCount = 1  -- Resetar a contagem
+            else
+                -- Ativa o pulo infinito
+                enableInfiniteJump()
+                print("Pulo Infinito Ativado!")
+                jumpPressCount = 0  -- Resetar a contagem de pressionamentos
+            end
+        end
+    end
+end)
