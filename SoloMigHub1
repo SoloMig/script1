@@ -209,3 +209,45 @@ UIS.InputBegan:Connect(function(input)
         end
     end
 end)
+
+-- Noclip (atravessar paredes)
+local noclipAtivo = false
+
+-- Função para ativar/desativar noclip
+local function ToggleNoclip()
+    noclipAtivo = not noclipAtivo
+end
+
+-- Loop para manter o Noclip ativado quando necessário
+RunService.Stepped:Connect(function()
+    if noclipAtivo and LocalPlayer.Character then
+        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- Botão visual para ativar/desativar noclip
+local NoclipButton = Instance.new("TextButton", Frame)
+NoclipButton.Position = UDim2.new(0, 10, 0, 190)
+NoclipButton.Size = UDim2.new(0, 200, 0, 40)
+NoclipButton.Text = "Ativar Noclip"
+NoclipButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+NoclipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoclipButton.Font = Enum.Font.GothamBold
+NoclipButton.TextScaled = true
+
+NoclipButton.MouseButton1Click:Connect(function()
+    ToggleNoclip()
+    NoclipButton.Text = noclipAtivo and "Desativar Noclip" or "Ativar Noclip"
+end)
+
+-- Atalho do teclado: tecla L ativa/desativa o Noclip
+UIS.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.L then
+        ToggleNoclip()
+        NoclipButton.Text = noclipAtivo and "Desativar Noclip" or "Ativar Noclip"
+    end
+end)
