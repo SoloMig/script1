@@ -360,45 +360,53 @@ end
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
--- Função para teleportar para checkpoint aleatório
-local function teleportToRandomCheckpoint()
-	local checkpoints = {}
-	for _, part in pairs(workspace:GetDescendants()) do
-		if part:IsA("BasePart") and part.Name:lower():find("checkpoint") then
-			table.insert(checkpoints, part)
+-- Detecta todos os checkpoints válidos (SpawnLocation ou blocos com "checkpoint" no nome)
+local function getCheckpoints()
+	local list = {}
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("BasePart") and (v.Name:lower():find("checkpoint") or v:IsA("SpawnLocation")) then
+			table.insert(list, v)
 		end
 	end
+	return list
+end
 
-	if #checkpoints > 0 and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-		local chosen = checkpoints[math.random(1, #checkpoints)]
-		LocalPlayer.Character.HumanoidRootPart.CFrame = chosen.CFrame + Vector3.new(0, 5, 0)
+-- Teleporta para um aleatório (com pequeno deslocamento vertical)
+local function teleportRandomCheckpoint()
+	local hrp = Character:FindFirstChild("HumanoidRootPart")
+	local cps = getCheckpoints()
+	if #cps > 0 and hrp then
+		local chosen = cps[math.random(1, #cps)]
+		hrp.CFrame = chosen.CFrame + Vector3.new(0, 3, 0)
+	else
+		warn("Nenhum checkpoint válido encontrado.")
 	end
 end
 
--- Criar a bolinha preta pequena
+-- Criar bolinha preta pequena e movível
 local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "SoloMigTeleportDot"
+gui.Name = "SoloMigCheckpointDot"
 
-local ball = Instance.new("TextButton", gui)
-ball.Name = "TeleportDot"
-ball.Size = UDim2.new(0, 30, 0, 30)
-ball.Position = UDim2.new(0.1, 0, 0.1, 0)
+local ball = Instance.new("TextButton")
+ball.Name = "CheckpointDot"
+ball.Size = UDim2.new(0, 25, 0, 25)
+ball.Position = UDim2.new(0.05, 0, 0.2, 0)
 ball.BackgroundColor3 = Color3.new(0, 0, 0)
 ball.Text = ""
 ball.BorderSizePixel = 0
 ball.Active = true
 ball.Draggable = true
+ball.Parent = gui
 
--- Clique na bolinha para teleportar
-ball.MouseButton1Click:Connect(function()
-	teleportToRandomCheckpoint()
-end)
+-- Botão mobile: clicar → teleporta
+ball.MouseButton1Click:Connect(teleportRandomCheckpoint)
 
--- Tecla de atalho X para teleportar
-UIS.InputBegan:Connect(function(input, isTyping)
-	if isTyping then return end
+-- Tecla X → teleporta também
+UIS.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
 	if input.KeyCode == Enum.KeyCode.X then
-		teleportToRandomCheckpoint()
+		teleportRandomCheckpoint()
 	end
 end)
