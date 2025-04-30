@@ -378,11 +378,11 @@ ball.Parent = screenGui
 ball.Active = true
 ball.Draggable = true
 
--- Função para voltar ao chão
+-- Função para voltar ao chão e subir mais alto
 local function bringBackToGround()
     if bodyPart.Position.Y < -10 then -- Checando se está abaixo da terra
-        -- Teleporta para o chão
-        bodyPart.CFrame = CFrame.new(bodyPart.Position.X, 0, bodyPart.Position.Z)
+        -- Teleporta para uma altura maior que o chão
+        bodyPart.CFrame = CFrame.new(bodyPart.Position.X, 30, bodyPart.Position.Z) -- Ajuste o valor de "30" para a altura desejada
     end
 end
 
@@ -406,4 +406,3 @@ if UIS.TouchEnabled then
 
     touchButton.MouseButton1Click:Connect(bringBackToGround)
 end
-
