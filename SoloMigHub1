@@ -393,15 +393,72 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	end
 end)
 
-local player = game.Players.LocalPlayer
-local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+-- SoloMig Hub - Speed Interface (Velocidade 60 com tecla B e suporte mobile)
 
-if humanoid then
-    humanoid.WalkSpeed = 100
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local speedOn = false
+local speedValue = 60
+
+-- Interface básica se ainda não existir
+local screenGui = game.CoreGui:FindFirstChild("SoloMig Hub") or Instance.new("ScreenGui", game.CoreGui)
+screenGui.Name = "SoloMig Hub"
+
+-- Criando a interface de Speed no lado direito da tela
+local speedFrame = Instance.new("Frame")
+speedFrame.Size = UDim2.new(0, 120, 0, 50)
+speedFrame.Position = UDim2.new(1, -130, 0, 100)
+speedFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+speedFrame.Parent = screenGui
+speedFrame.Active = true
+speedFrame.Visible = true
+
+-- Texto de status do Speed
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(1, 0, 0.5, 0)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Speed OFF"
+speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedLabel.TextScaled = true
+speedLabel.Parent = speedFrame
+
+-- Botão de Speed (Mobile)
+local speedButton = Instance.new("TextButton")
+speedButton.Size = UDim2.new(1, 0, 0.5, 0)
+speedButton.Position = UDim2.new(0, 0, 0.5, 0)
+speedButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedButton.Text = "Ativar Speed"
+speedButton.Name = "SpeedBtn"
+speedButton.Parent = speedFrame
+speedButton.Active = true
+speedButton.Draggable = true
+
+-- Função para alternar Speed
+local function toggleSpeed()
+	local char = player.Character
+	if char and char:FindFirstChildOfClass("Humanoid") then
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		speedOn = not speedOn
+		hum.WalkSpeed = speedOn and speedValue or 16
+		speedLabel.Text = speedOn and "Speed ON" or "Speed OFF"
+		speedButton.Text = speedOn and "Desativar Speed" or "Ativar Speed"
+	end
 end
 
--- Atualiza o speed caso o jogador resetar
+-- Ação no clique do botão
+speedButton.MouseButton1Click:Connect(toggleSpeed)
+
+-- Ação na tecla B
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.B then
+		toggleSpeed()
+	end
+end)
+
+-- Mantém speed após morrer
 player.CharacterAdded:Connect(function(char)
-    local hum = char:WaitForChild("Humanoid")
-    hum.WalkSpeed = 100
+	char:WaitForChild("Humanoid").WalkSpeed = speedOn and speedValue or 16
 end)
