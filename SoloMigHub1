@@ -357,19 +357,6 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
-local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = game.Players.LocalPlayer
-
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.KeyCode == Enum.KeyCode.X then
-		local char = LocalPlayer.Character
-		if char and char:FindFirstChild("HumanoidRootPart") then
-			char.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0) -- Volta para o mapa
-		end
-	end
-end)
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -377,13 +364,13 @@ local LocalPlayer = Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.Name = "SoloMigMobileReturn"
 
--- Cria a bolinha preta pequena no lado direito
+-- Cria a bolinha preta pequena
 local button = Instance.new("TextButton")
 button.Parent = screenGui
 button.Name = "ReturnButton"
 button.Text = ""
 button.Size = UDim2.new(0, 30, 0, 30)
-button.Position = UDim2.new(1, -40, 0, 200) -- lado direito
+button.Position = UDim2.new(0, 10, 0, 200) -- posição da bolinha
 button.BackgroundColor3 = Color3.new(0, 0, 0)
 button.BorderSizePixel = 0
 button.TextTransparency = 1
