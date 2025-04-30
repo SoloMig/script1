@@ -357,47 +357,55 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
--- SoloMig Hub - Teleporte ao chão real detectado por Raycast
+-- SoloMig Hub - Teleporte para o chão (corrigido e funcional)
 
+local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local player = game.Players.LocalPlayer
-local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local screenGui = game.CoreGui:FindFirstChild("SoloMig Hub") or Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "SoloMig Hub"
+local RunService = game:GetService("RunService")
 
--- Bolinha Preta Móvel
-local ball = Instance.new("Frame")
-ball.Size = UDim2.new(0, 30, 0, 30)
-ball.Position = UDim2.new(0, 200, 0, 300)
-ball.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ball.BorderSizePixel = 0
-ball.Active = true
+-- Interface principal
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SoloMigHub_TeleportChao"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game:GetService("CoreGui")
+
+-- Bolinha preta móvel
+local ball = Instance.new("TextButton")
+ball.Name = "ChaoButton"
+ball.Size = UDim2.new(0, 40, 0, 40)
+ball.Position = UDim2.new(1, -70, 0.5, 0)
+ball.BackgroundColor3 = Color3.new(0, 0, 0)
+ball.Text = ""
+ball.AutoButtonColor = true
 ball.Draggable = true
+ball.Active = true
 ball.Parent = screenGui
 
--- Função para encontrar o chão abaixo do personagem
+-- Teleporta para o chão detectado com Raycast
 local function teleportToGround()
-	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	local character = player.Character or player.CharacterAdded:Wait()
+	local hrp = character:FindFirstChild("HumanoidRootPart")
 	if not hrp then return end
 
 	local origin = hrp.Position
-	local direction = Vector3.new(0, -1000, 0) -- Raycast para baixo
+	local direction = Vector3.new(0, -500, 0)
 
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = {character}
 	raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
 
 	local result = workspace:Raycast(origin, direction, raycastParams)
-
 	if result then
-		local safeY = result.Position.Y + 5 -- um pouco acima do chão
-		hrp.CFrame = CFrame.new(origin.X, safeY, origin.Z)
+		hrp.CFrame = CFrame.new(origin.X, result.Position.Y + 5, origin.Z)
 	else
-		-- Se não achar chão, teleporta para Y = 100 como fallback
 		hrp.CFrame = CFrame.new(origin.X, 100, origin.Z)
 	end
 end
+
+-- Clique na bolinha (mobile e PC)
+ball.MouseButton1Click:Connect(teleportToGround)
 
 -- Atalho de teclado (X)
 UIS.InputBegan:Connect(function(input, gameProcessed)
@@ -405,17 +413,3 @@ UIS.InputBegan:Connect(function(input, gameProcessed)
 		teleportToGround()
 	end
 end)
-
--- Botão Mobile (lado direito)
-if UIS.TouchEnabled then
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(0, 100, 0, 50)
-	button.Position = UDim2.new(1, -110, 0, 200)
-	button.Text = "Voltar Chão"
-	button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	button.TextColor3 = Color3.fromRGB(255, 255, 255)
-	button.TextScaled = true
-	button.Parent = screenGui
-
-	button.MouseButton1Click:Connect(teleportToGround)
-end
