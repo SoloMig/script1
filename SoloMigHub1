@@ -357,51 +357,53 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
--- SoloMig Hub - Bolinha Preta com Retorno ao Chão (Altura Y = 50)
+-- SoloMig Hub - Bolinha Preta com Retorno ao Chão (Altura Y = 60)
 
 local UIS = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local bodyPart = character:WaitForChild("HumanoidRootPart")
 local screenGui = game.CoreGui:FindFirstChild("SoloMig Hub") or Instance.new("ScreenGui", game.CoreGui)
 screenGui.Name = "SoloMig Hub"
-screenGui.Parent = game.CoreGui
 
--- Bolinha Preta
+-- Bolinha Preta Móvel
 local ball = Instance.new("Frame")
 ball.Size = UDim2.new(0, 30, 0, 30)
-ball.Position = UDim2.new(0, 200, 0, 300) -- Posição inicial
+ball.Position = UDim2.new(0, 200, 0, 300) -- posição inicial
 ball.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ball.AnchorPoint = Vector2.new(0.5, 0.5)
-ball.Parent = screenGui
+ball.BorderSizePixel = 0
 ball.Active = true
 ball.Draggable = true
+ball.Parent = screenGui
 
--- Função para voltar ao chão com altura Y = 50
-local function bringBackToGround()
-    if bodyPart.Position.Y < -10 then -- Checando se está abaixo da terra
-        bodyPart.CFrame = CFrame.new(bodyPart.Position.X, 50, bodyPart.Position.Z) -- Altura aumentada para 50
-    end
+-- Função para teleportar ao chão (Y = 60)
+local function teleportToGround()
+	local character = player.Character
+	if character and character:FindFirstChild("HumanoidRootPart") then
+		character.HumanoidRootPart.CFrame = CFrame.new(
+			character.HumanoidRootPart.Position.X,
+			60,
+			character.HumanoidRootPart.Position.Z
+		)
+	end
 end
 
--- Tecla X para voltar ao chão no PC
+-- Atalho de teclado (X)
 UIS.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.X then
-        bringBackToGround()
-    end
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.X then
+		teleportToGround()
+	end
 end)
 
--- Botão mobile no lado direito da tela
+-- Botão para mobile (lado direito)
 if UIS.TouchEnabled then
-    local touchButton = Instance.new("TextButton")
-    touchButton.Size = UDim2.new(0, 100, 0, 50)
-    touchButton.Position = UDim2.new(1, -110, 0, 300)
-    touchButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    touchButton.Text = "Voltar ao Chão"
-    touchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    touchButton.Parent = screenGui
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 100, 0, 50)
+	button.Position = UDim2.new(1, -110, 0, 200)
+	button.Text = "Voltar Chão"
+	button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	button.TextColor3 = Color3.fromRGB(255, 255, 255)
+	button.TextScaled = true
+	button.Parent = screenGui
 
-    touchButton.MouseButton1Click:Connect(bringBackToGround)
+	button.MouseButton1Click:Connect(teleportToGround)
 end
