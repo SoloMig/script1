@@ -357,35 +357,38 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
--- Cria a interface
-local screenGui = Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "SoloMigMobileReturn"
-
--- Cria a bolinha preta pequena
-local button = Instance.new("TextButton")
-button.Parent = screenGui
-button.Name = "ReturnButton"
-button.Text = ""
-button.Size = UDim2.new(0, 30, 0, 30)
-button.Position = UDim2.new(0, 10, 0, 200) -- posição da bolinha
-button.BackgroundColor3 = Color3.new(0, 0, 0)
-button.BorderSizePixel = 0
-button.TextTransparency = 1
-button.Active = true
-button.Draggable = true
-button.AutoButtonColor = false
-button.BackgroundTransparency = 0.2
-button.ZIndex = 9999
-button.AnchorPoint = Vector2.new(0, 0)
-
--- Quando o botão for clicado/tocado
 button.MouseButton1Click:Connect(function()
-	local char = LocalPlayer.Character
-	if char and char:FindFirstChild("HumanoidRootPart") then
-		-- Volta para uma posição segura
-		char.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+    -- Encontra todas as partes que parecem checkpoints
+    local checkpoints = {}
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and v.Name:lower():find("checkpoint") then
+            table.insert(checkpoints, v)
+        end
+    end
+
+    -- Teleporta para um checkpoint aleatório, 5 studs acima dele
+    if #checkpoints > 0 then
+        local chosen = checkpoints[math.random(1, #checkpoints)]
+        local safePosition = chosen.Position + Vector3.new(0, 5, 0)
+        character:MoveTo(safePosition)
+    else
+        warn("Nenhum checkpoint encontrado no mapa.")
+    end
+end)
+
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = game.Players.LocalPlayer
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.X then
+		local char = LocalPlayer.Character
+		if char and char:FindFirstChild("HumanoidRootPart") then
+			char.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0) -- Volta para o mapa
+		end
 	end
 end)
