@@ -369,3 +369,36 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		end
 	end
 end)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Cria a interface
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+screenGui.Name = "SoloMigMobileReturn"
+
+-- Cria a bolinha preta pequena no lado direito
+local button = Instance.new("TextButton")
+button.Parent = screenGui
+button.Name = "ReturnButton"
+button.Text = ""
+button.Size = UDim2.new(0, 30, 0, 30)
+button.Position = UDim2.new(1, -40, 0, 200) -- lado direito
+button.BackgroundColor3 = Color3.new(0, 0, 0)
+button.BorderSizePixel = 0
+button.TextTransparency = 1
+button.Active = true
+button.Draggable = true
+button.AutoButtonColor = false
+button.BackgroundTransparency = 0.2
+button.ZIndex = 9999
+button.AnchorPoint = Vector2.new(0, 0)
+
+-- Quando o botão for clicado/tocado
+button.MouseButton1Click:Connect(function()
+	local char = LocalPlayer.Character
+	if char and char:FindFirstChild("HumanoidRootPart") then
+		-- Volta para uma posição segura
+		char.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0)
+	end
+end)
