@@ -357,7 +357,7 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
--- SoloMig Hub - Bolinha Preta com Retorno ao Chão (Altura Y = 60)
+-- SoloMig Hub - Bolinha Preta com Retorno ao Chão (Altura Y = 100)
 
 local UIS = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
@@ -375,13 +375,13 @@ ball.Active = true
 ball.Draggable = true
 ball.Parent = screenGui
 
--- Função para teleportar ao chão (Y = 60)
+-- Função para teleportar ao chão (Y = 100)
 local function teleportToGround()
 	local character = player.Character
 	if character and character:FindFirstChild("HumanoidRootPart") then
 		character.HumanoidRootPart.CFrame = CFrame.new(
 			character.HumanoidRootPart.Position.X,
-			60,
+			100,
 			character.HumanoidRootPart.Position.Z
 		)
 	end
