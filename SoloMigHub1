@@ -392,3 +392,16 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		end
 	end
 end)
+
+local player = game.Players.LocalPlayer
+local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+
+if humanoid then
+    humanoid.WalkSpeed = 100
+end
+
+-- Atualiza o speed caso o jogador resetar
+player.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid")
+    hum.WalkSpeed = 100
+end)
