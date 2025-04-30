@@ -357,7 +357,7 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
--- SoloMig Hub - Bolinha Preta com Retorno ao Chão
+-- SoloMig Hub - Bolinha Preta com Retorno ao Chão (Altura Y = 50)
 
 local UIS = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
@@ -378,11 +378,10 @@ ball.Parent = screenGui
 ball.Active = true
 ball.Draggable = true
 
--- Função para voltar ao chão e subir mais alto
+-- Função para voltar ao chão com altura Y = 50
 local function bringBackToGround()
     if bodyPart.Position.Y < -10 then -- Checando se está abaixo da terra
-        -- Teleporta para uma altura maior que o chão
-        bodyPart.CFrame = CFrame.new(bodyPart.Position.X, 30, bodyPart.Position.Z) -- Ajuste o valor de "30" para a altura desejada
+        bodyPart.CFrame = CFrame.new(bodyPart.Position.X, 50, bodyPart.Position.Z) -- Altura aumentada para 50
     end
 end
 
@@ -394,7 +393,7 @@ UIS.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- Função para criar o botão no mobile (não precisa de tecla de atalho)
+-- Botão mobile no lado direito da tela
 if UIS.TouchEnabled then
     local touchButton = Instance.new("TextButton")
     touchButton.Size = UDim2.new(0, 100, 0, 50)
