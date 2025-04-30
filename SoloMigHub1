@@ -357,3 +357,48 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Função para teleportar para checkpoint aleatório
+local function teleportToRandomCheckpoint()
+	local checkpoints = {}
+	for _, part in pairs(workspace:GetDescendants()) do
+		if part:IsA("BasePart") and part.Name:lower():find("checkpoint") then
+			table.insert(checkpoints, part)
+		end
+	end
+
+	if #checkpoints > 0 and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local chosen = checkpoints[math.random(1, #checkpoints)]
+		LocalPlayer.Character.HumanoidRootPart.CFrame = chosen.CFrame + Vector3.new(0, 5, 0)
+	end
+end
+
+-- Criar a bolinha preta pequena
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "SoloMigTeleportDot"
+
+local ball = Instance.new("TextButton", gui)
+ball.Name = "TeleportDot"
+ball.Size = UDim2.new(0, 30, 0, 30)
+ball.Position = UDim2.new(0.1, 0, 0.1, 0)
+ball.BackgroundColor3 = Color3.new(0, 0, 0)
+ball.Text = ""
+ball.BorderSizePixel = 0
+ball.Active = true
+ball.Draggable = true
+
+-- Clique na bolinha para teleportar
+ball.MouseButton1Click:Connect(function()
+	teleportToRandomCheckpoint()
+end)
+
+-- Tecla de atalho X para teleportar
+UIS.InputBegan:Connect(function(input, isTyping)
+	if isTyping then return end
+	if input.KeyCode == Enum.KeyCode.X then
+		teleportToRandomCheckpoint()
+	end
+end)
