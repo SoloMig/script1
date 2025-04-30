@@ -357,18 +357,12 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
--- Função para teletransportar para as costas do inimigo
-local function TeleportToEnemyBack()
-    local target = GetClosestEnemy()
-    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-        local enemyPosition = target.Character.HumanoidRootPart.Position
-        local direction = (Camera.CFrame.Position - enemyPosition).Unit
-        local teleportPosition = enemyPosition + direction * 5  -- Teletransporta 5 unidades atrás do inimigo
-        LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(teleportPosition))
-    end
-end
+-- Variáveis principais
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
 
--- Função para teletransportar de volta ao mapa (evitar cair no void)
+-- Função para voltar ao mapa (teleportar para o spawn)
 local function TeleportBackToMap()
     local spawnPosition = workspace:WaitForChild("SpawnLocation")  -- Pode ser qualquer parte do mapa de "spawn"
     if spawnPosition and spawnPosition:IsA("BasePart") then
@@ -376,9 +370,29 @@ local function TeleportBackToMap()
     end
 end
 
--- Criando o botão "Voltar ao Mapa" na interface (já existente)
+-- Interface SoloMig Hub para Desktop e Mobile
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Position = UDim2.new(0.05, 0, 0.2, 0)
+Frame.Size = UDim2.new(0, 220, 0, 270)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderColor3 = Color3.fromRGB(255, 0, 0)
+Frame.BorderSizePixel = 2
+Frame.Active = true
+Frame.Draggable = true
+
+-- Título
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "SoloMig Hub"
+Title.TextColor3 = Color3.fromRGB(255, 0, 0)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
+
+-- Botões
 local ReturnToMapButton = Instance.new("TextButton", Frame)
-ReturnToMapButton.Position = UDim2.new(0, 10, 0, 240)  -- Posicionando o botão logo abaixo do botão Teleportar
+ReturnToMapButton.Position = UDim2.new(0, 10, 0, 90)
 ReturnToMapButton.Size = UDim2.new(0, 200, 0, 40)
 ReturnToMapButton.Text = "Voltar ao Mapa (X)"
 ReturnToMapButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
@@ -386,16 +400,34 @@ ReturnToMapButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ReturnToMapButton.Font = Enum.Font.GothamBold
 ReturnToMapButton.TextScaled = true
 
--- Ação do botão para voltar ao mapa
+-- Botão para Mobile
+local MobileButtonReturn = Instance.new("TextButton", ScreenGui)
+MobileButtonReturn.Position = UDim2.new(0.05, 0, 0.85, 0)
+MobileButtonReturn.Size = UDim2.new(0, 200, 0, 50)
+MobileButtonReturn.Text = "Voltar ao Mapa"
+MobileButtonReturn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MobileButtonReturn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MobileButtonReturn.Font = Enum.Font.GothamBold
+MobileButtonReturn.TextScaled = true
+
+-- Ações dos botões
 ReturnToMapButton.MouseButton1Click:Connect(function()
     TeleportBackToMap()
     warn("Você foi teletransportado de volta ao mapa!")
 end)
 
--- Tecla de atalho (X) para voltar ao mapa
+MobileButtonReturn.MouseButton1Click:Connect(function()
+    TeleportBackToMap()
+    warn("Você foi teletransportado de volta ao mapa!")
+end)
+
+-- Tecla de atalho (X)
 UIS.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.X then
-        TeleportBackToMap()
-        warn("Você foi teletransportado de volta ao mapa!")
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.X then
+            TeleportBackToMap()
+            warn("Você foi teletransportado de volta ao mapa!")
+        end
     end
 end)
+
