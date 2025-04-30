@@ -357,42 +357,6 @@ local function GetClosestEnemy()
     return closestEnemy
 end
 
-button.MouseButton1Click:Connect(function()
-    local player = game.Players.LocalPlayer
-    local character = player.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
-
-    -- Encontra todas as partes que parecem checkpoints
-    local checkpoints = {}
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") and v.Name:lower():find("checkpoint") then
-            table.insert(checkpoints, v)
-        end
-    end
-
-    -- Teleporta para um checkpoint aleatório, 5 studs acima dele
-    if #checkpoints > 0 then
-        local chosen = checkpoints[math.random(1, #checkpoints)]
-        local safePosition = chosen.Position + Vector3.new(0, 5, 0)
-        character:MoveTo(safePosition)
-    else
-        warn("Nenhum checkpoint encontrado no mapa.")
-    end
-end)
-
-local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = game.Players.LocalPlayer
-
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.KeyCode == Enum.KeyCode.X then
-		local char = LocalPlayer.Character
-		if char and char:FindFirstChild("HumanoidRootPart") then
-			char.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0) -- Volta para o mapa
-		end
-	end
-end)
-
 -- SoloMig Hub - Bolinha Preta com Retorno ao Chão
 
 local UIS = game:GetService("UserInputService")
@@ -402,7 +366,7 @@ local humanoid = character:WaitForChild("Humanoid")
 local bodyPart = character:WaitForChild("HumanoidRootPart")
 local screenGui = game.CoreGui:FindFirstChild("SoloMig Hub") or Instance.new("ScreenGui", game.CoreGui)
 screenGui.Name = "SoloMig Hub"
-local isMobile = UIS.TouchEnabled
+screenGui.Parent = game.CoreGui
 
 -- Bolinha Preta
 local ball = Instance.new("Frame")
@@ -422,16 +386,16 @@ local function bringBackToGround()
     end
 end
 
--- Tecla N para voltar ao chão no PC
+-- Tecla X para voltar ao chão no PC
 UIS.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.N then
+    if input.KeyCode == Enum.KeyCode.X then
         bringBackToGround()
     end
 end)
 
 -- Função para criar o botão no mobile (não precisa de tecla de atalho)
-if isMobile then
+if UIS.TouchEnabled then
     local touchButton = Instance.new("TextButton")
     touchButton.Size = UDim2.new(0, 100, 0, 50)
     touchButton.Position = UDim2.new(1, -110, 0, 300)
@@ -442,3 +406,4 @@ if isMobile then
 
     touchButton.MouseButton1Click:Connect(bringBackToGround)
 end
+
