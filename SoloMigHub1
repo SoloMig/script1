@@ -376,50 +376,15 @@ local function TeleportBackToMap()
     end
 end
 
--- Criando a interface do SoloMig Hub (já existente no código)
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local Frame = Instance.new("Frame", ScreenGui)
-Frame.Position = UDim2.new(0.05, 0, 0.2, 0)
-Frame.Size = UDim2.new(0, 220, 0, 270)
-Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Frame.BorderColor3 = Color3.fromRGB(255, 0, 0)
-Frame.BorderSizePixel = 2
-Frame.Active = true
-Frame.Draggable = true
-
--- Título da interface
-local Title = Instance.new("TextLabel", Frame)
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.BackgroundTransparency = 1
-Title.Text = "SoloMig Hub"
-Title.TextColor3 = Color3.fromRGB(255, 0, 0)
-Title.Font = Enum.Font.GothamBold
-Title.TextScaled = true
-
--- Botões
-local TeleportButton = Instance.new("TextButton", Frame)
-TeleportButton.Position = UDim2.new(0, 10, 0, 190)  -- Posicionando o botão logo abaixo do botão Noclip
-TeleportButton.Size = UDim2.new(0, 200, 0, 40)
-TeleportButton.Text = "Teleportar para as Costas do Inimigo (Z)"
-TeleportButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-TeleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-TeleportButton.Font = Enum.Font.GothamBold
-TeleportButton.TextScaled = true
-
+-- Criando o botão "Voltar ao Mapa" na interface (já existente)
 local ReturnToMapButton = Instance.new("TextButton", Frame)
 ReturnToMapButton.Position = UDim2.new(0, 10, 0, 240)  -- Posicionando o botão logo abaixo do botão Teleportar
 ReturnToMapButton.Size = UDim2.new(0, 200, 0, 40)
-ReturnToMapButton.Text = "Voltar ao Mapa"
+ReturnToMapButton.Text = "Voltar ao Mapa (X)"
 ReturnToMapButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 ReturnToMapButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ReturnToMapButton.Font = Enum.Font.GothamBold
 ReturnToMapButton.TextScaled = true
-
--- Ação do botão para teleporte para as costas do inimigo
-TeleportButton.MouseButton1Click:Connect(function()
-    TeleportToEnemyBack()
-    warn("Teleportado para as costas do inimigo!")
-end)
 
 -- Ação do botão para voltar ao mapa
 ReturnToMapButton.MouseButton1Click:Connect(function()
@@ -427,17 +392,9 @@ ReturnToMapButton.MouseButton1Click:Connect(function()
     warn("Você foi teletransportado de volta ao mapa!")
 end)
 
--- Tecla de atalho (Z) para ativar o teleporte para as costas do inimigo
+-- Tecla de atalho (X) para voltar ao mapa
 UIS.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Z then
-        TeleportToEnemyBack()
-        warn("Teleportado para as costas do inimigo!")
-    end
-end)
-
--- Tecla de atalho (V) para voltar ao mapa
-UIS.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.V then
+    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.X then
         TeleportBackToMap()
         warn("Você foi teletransportado de volta ao mapa!")
     end
